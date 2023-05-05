@@ -42,7 +42,7 @@ export default function Home(): JSX.Element {
     const hasSymbol = /[^A-Za-z0-9]/.test(password);
 
     if (
-      password.length < 6 ||
+      password.length < 9 ||
       (!hasUppercase && options.uppercase) ||
       (!hasNumber && options.numbers) ||
       (!hasSymbol && options.symbols)
@@ -89,7 +89,7 @@ export default function Home(): JSX.Element {
   ) as (keyof IOptions)[];
 
   return (
-    <main className="flex flex-col items-center justify-between h-full">
+    <main className="flex flex-col items-center justify-between">
       <section className="flex flex-col items-center justify-center w-full max-w-sm min-h-screen mx-auto space-y-3 align-center">
         <h1>Password Generator</h1>
         <div className="flex justify-between w-full px-6 py-3 bg-zinc-900">
@@ -100,15 +100,8 @@ export default function Home(): JSX.Element {
           >
             {password}
           </span>
-          <button>
-            <Image
-              src={CopyImage}
-              alt="Copy"
-              width={18}
-              height={18}
-              onClick={() => handleCopy(password)}
-              className="hover:fill-neutral-50"
-            />
+          <button onClick={() => handleCopy(password)}>
+            <Image src={CopyImage} alt="Copy" width={18} height={18} />
           </button>
         </div>
         <article className="flex w-full p-6 bg-zinc-900">
