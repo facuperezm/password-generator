@@ -14,11 +14,13 @@ const INITIAL_VALUES: IOptions = {
   symbols: false,
 };
 
+const INITIAL_PASSWORD = "P4$5W0rD!";
+
 export default function Home(): JSX.Element {
   const [copy, setCopy] = React.useState<boolean>(false);
   const [options, setOptions] = React.useState<IOptions>(INITIAL_VALUES);
-  const [strength, setStrength] = useState<string>("weak");
-  const [password, setPassword] = useState<string>("asdfff");
+  const [strength, setStrength] = useState("");
+  const [password, setPassword] = useState<string>(INITIAL_PASSWORD);
   const [length, setLength] = useState<number>(12);
 
   React.useEffect(() => {
@@ -34,12 +36,16 @@ export default function Home(): JSX.Element {
     setCopy(true);
   };
 
-  function checkStrength(password: string): void {
+  function checkStrength(password: string, options: IOptions): void {
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSymbol = /[^A-Za-z0-9]/.test(password);
+
     if (
-      password.length < 8 ||
-      options.uppercase === false ||
-      options.numbers === false ||
-      options.symbols === false
+      password.length < 6 ||
+      (!hasUppercase && options.uppercase) ||
+      (!hasNumber && options.numbers) ||
+      (!hasSymbol && options.symbols)
     ) {
       setStrength("weak");
     } else if (password.length < 12) {
@@ -64,7 +70,7 @@ export default function Home(): JSX.Element {
     for (let i = 0; i < length; i++) {
       password += charset.charAt(Math.floor(Math.random() * charset.length));
     }
-    checkStrength(password);
+    checkStrength(password, options);
     setPassword(password);
   }
 
@@ -83,11 +89,17 @@ export default function Home(): JSX.Element {
   ) as (keyof IOptions)[];
 
   return (
-    <main className="flex flex-col items-center justify-between h-screen">
+    <main className="flex flex-col items-center justify-between h-full">
       <section className="flex flex-col items-center justify-center w-full max-w-sm min-h-screen mx-auto space-y-3 align-center">
         <h1>Password Generator</h1>
-        <div className="flex justify-between w-full p-4 bg-zinc-900">
-          <span className="text-xl font-bold">{password}</span>
+        <div className="flex justify-between w-full px-6 py-3 bg-zinc-900">
+          <span
+            className={`${
+              password === INITIAL_PASSWORD && "text-zinc-700"
+            } text-xl font-bold`}
+          >
+            {password}
+          </span>
           <button>
             <Image
               src={CopyImage}
@@ -99,7 +111,7 @@ export default function Home(): JSX.Element {
             />
           </button>
         </div>
-        <article className="flex w-full p-4 bg-zinc-900">
+        <article className="flex w-full p-6 bg-zinc-900">
           <form className="flex flex-col w-full gap-3" onSubmit={handleSubmit}>
             <label htmlFor="length">
               <div className="flex items-center justify-between">
@@ -111,8 +123,8 @@ export default function Home(): JSX.Element {
               <input
                 type="range"
                 id="length"
-                min={0}
-                max={15}
+                min={5}
+                max={18}
                 value={length}
                 onChange={(event) => {
                   setLength(parseInt(event.target.value, 10));
@@ -133,7 +145,7 @@ export default function Home(): JSX.Element {
                       [option]: event.target.checked,
                     });
                   }}
-                  className="mr-4 border-2 bg-[url('/public/icon-check.svg')] border-gray-300 cursor-pointer text-lime-200 bg-zinc-800 hover:border-lime-200 checked:bg-lime-200 checked:accent-red-900 active:bg-none"
+                  className="mr-4 border-2 bg-[url('/public/icon-check.svg')]  border-gray-300 cursor-pointer text-lime-200 bg-zinc-800 hover:border-lime-200 checked:bg-lime-200 checked:accent-red-900 active:bg-none"
                 />
                 <label htmlFor={option} className="capitalize">
                   Include {option}
@@ -145,18 +157,42 @@ export default function Home(): JSX.Element {
               <div className="flex gap-2 text-gray-100 uppercase">
                 <span className="text-lg text-gray-100">{strength}</span>
                 <div className="flex gap-2">
-                  <div className="w-2 h-6 bg-red-900"></div>
+                  {/* <div className="w-2 h-6 bg-red-900"></div>
                   <div className="w-2 h-6 bg-red-900"></div>
                   <div className="w-2 h-6 border"></div>
-                  <div className="w-2 h-6 border"></div>
+                  <div className="w-2 h-6 border"></div> */}
+                  {strength === "weak" && (
+                    <>
+                      <div className="w-2 h-6 bg-red-900"></div>
+                      <div className="w-2 h-6 border"></div>
+                      <div className="w-2 h-6 border"></div>
+                      <div className="w-2 h-6 border"></div>
+                    </>
+                  )}
+                  {strength === "medium" && (
+                    <>
+                      <div className="w-2 h-6 bg-yellow-900"></div>
+                      <div className="w-2 h-6 bg-yellow-900"></div>
+                      <div className="w-2 h-6 bg-yellow-900"></div>
+                      <div className="w-2 h-6 border"></div>
+                    </>
+                  )}
+                  {strength === "strong" && (
+                    <>
+                      <div className="w-2 h-6 bg-green-900"></div>
+                      <div className="w-2 h-6 bg-green-900"></div>
+                      <div className="w-2 h-6 bg-green-900"></div>
+                      <div className="w-2 h-6 bg-green-900"></div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
             <button
               type="submit"
-              className="w-full p-3 font-bold bg-lime-200 text-zinc-900"
+              className="w-full p-3 font-semibold border bg-lime-200 text-zinc-900 hover:bg-transparent hover:text-lime-200 border-lime-200"
             >
-              GENERATE &gt;
+              GENERATE →
             </button>
           </form>
         </article>
